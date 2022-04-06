@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <cstdint>
+#include <type_traits>
 
 template<typename t>
 struct array_view 
@@ -100,34 +101,43 @@ public:
     array_view(t* data, std::size_t count) noexcept : _data { data }, _count { count }
     {};
 
+    template<typename container_t>
+    array_view(const container_t& v) : _data { v.data() }, _count { v.size() }
+    {};
+
     [[nodiscard]] std::size_t size() const noexcept
     {
         return _count;
     }
 
-    [[nodiscard]] iterator begin() 
+    [[nodiscard]] iterator begin() noexcept
     {
         return iterator { *this };
     }
 
-    [[nodiscard]] iterator end() 
+    [[nodiscard]] iterator end() noexcept
     {
         iterator it { *this };
         it.position = size();
         return it;
     }
 
-    [[nodiscard]] t& back()
+    [[nodiscard]] t& back() noexcept
     {
         return *(--end());
     }
 
-    [[nodiscard]] t& front()
+    [[nodiscard]] t& front() noexcept
     {
         return *begin();
     }
 
-    [[nodiscard]] auto* data()
+    [[nodiscard]] auto* data() noexcept
+    {
+        return _data;
+    }
+
+    [[nodiscard]] const auto* data() const noexcept
     {
         return _data;
     }
@@ -138,3 +148,6 @@ public:
     }
 
 };
+
+template<typename container_t>
+array_view(const container_t& v) -> array_view<std::add_const_t<typename container_t::value_type>>;
