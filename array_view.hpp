@@ -150,4 +150,7 @@ public:
 };
 
 template<typename container_t>
-array_view(const container_t& v) -> array_view<std::add_const_t<typename container_t::value_type>>;
+array_view(container_t&& v) -> array_view<typename container_t::value_type>;
+
+template<typename container_t>
+array_view(container_t& v) -> array_view<typename container_t::value_type>;
